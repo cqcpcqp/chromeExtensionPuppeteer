@@ -1,5 +1,5 @@
 define([
-    "../puppeteer/log"
+    "../puppeteer/Log"
 ], function (log) {
     class EventEmitter {
         constructor() {
@@ -36,12 +36,8 @@ define([
             let events = this.events.get(label);
             if (events && events.length) {
                 events.forEach((event) => {
-                    if (!_.isEmpty(args)) {
-                        event(args);
-                    } else {
-                        event();
-                    }
-                })
+                    event(args);
+                });
                 return true;
             }
             return false;

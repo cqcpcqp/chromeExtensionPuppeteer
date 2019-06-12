@@ -1,6 +1,6 @@
 define([
-    "../puppeteer/event",
-    "../puppeteer/log",
+    "../puppeteer/Event",
+    "../puppeteer/Log",
 ], (EventEmitter, log) => {
     const timeout = 30000;
 

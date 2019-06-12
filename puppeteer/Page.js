@@ -1,6 +1,8 @@
 define([
-    "../puppeteer/event"
-], (EventEmitter) => {
+    "../puppeteer/Event",
+    "../puppeteer/ChromeEvent",
+    "../puppeteer/FrameManager"
+], (EventEmitter, ChromeEvent, FrameManager) => {
     class Page extends EventEmitter {
         static create() {
             let self = this;
@@ -14,6 +16,7 @@ define([
         constructor(id) {
             super();
             this.id = id;
+            this._frameManager = new FrameManager(id);
         }
 
         async goto(url) {
@@ -22,6 +25,12 @@ define([
                     resolve();
                 });
             })
+        }
+
+        async setRequestInterception(value) {
+            // to single page
+            return this._frameManager.networkManager().setRequestInterception(value)
+            return chromeEvent.setRequestInterception(value);
         }
 
 

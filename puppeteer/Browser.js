@@ -1,7 +1,7 @@
 define([
-    "../puppeteer/chromeEvent",
-    "../puppeteer/log",
-    "../puppeteer/page",
+    "../puppeteer/ChromeEvent",
+    "../puppeteer/Log",
+    "../puppeteer/Page",
 ], (ChromeEvent, log, Page) => {
     const timeout = 30000;
 
