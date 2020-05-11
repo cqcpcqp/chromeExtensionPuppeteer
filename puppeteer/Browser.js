@@ -2,7 +2,8 @@ define([
     "../puppeteer/ChromeEvent",
     "../puppeteer/Log",
     "../puppeteer/Page",
-], (ChromeEvent, log, Page) => {
+    "../puppeteer/RuntimeManager"
+], (ChromeEvent, log, Page, RuntimeManager) => {
     const timeout = 30000;
 
     class Browser extends ChromeEvent {
@@ -13,6 +14,7 @@ define([
                     self.registerPage(new Page(page.id));
                 })
             });
+            let _runtimeManager = new RuntimeManager()
             return new Browser();
         }
 

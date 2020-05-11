@@ -1,8 +1,10 @@
 define([
     "../puppeteer/Event",
     "../puppeteer/ChromeEvent",
-    "../puppeteer/FrameManager"
-], (EventEmitter, ChromeEvent, FrameManager) => {
+    "../puppeteer/FrameManager",
+    "../puppeteer/Log",
+    "../puppeteer/ElementHandle"
+], (EventEmitter, ChromeEvent, FrameManager, log, ElementHandle) => {
     class Page extends EventEmitter {
         static create() {
             let self = this;
@@ -19,7 +21,12 @@ define([
             this._frameManager = new FrameManager(id);
         }
 
+        mainFrame() {
+            return this._frameManager.mainFrame();
+        }
+
         async goto(url) {
+            //todo 他这个回调不太准确 我还需要那几个参数 暂时用sleep顶了
             return new Promise((resolve, reject) => {
                 chrome.tabs.update(this.id, {url: url}, function () {
                     resolve();
@@ -28,38 +35,46 @@ define([
         }
 
         async setRequestInterception(value) {
+            log.noApi();
             // to single page
-            return this._frameManager.networkManager().setRequestInterception(value)
-            return chromeEvent.setRequestInterception(value);
+            // return this._frameManager.networkManager().setRequestInterception(value)
         }
 
+        async $(selector) {
+            return this.mainFrame().$(selector);
+        }
 
-        // $(selector) {
-        //     return new Promise((resolve, reject) => {
-        //         let self = this;
-        //         //todo
-        //         let code = 'let re = document.querySelector("' + selector + '");' + "\n" +
-        //             'console.log(re);' + "\n" +
-        //             'chrome.runtime.sendMessage(re);' + "\n" +
-        //             'console.log("end");';
-        //
-        //         log("将要执行的代码为", code);
-        //         chrome.tabs.executeScript(self.id, {
-        //             code: code
-        //         })
-        //         self.on("executeResolveSuccess", function (req) {
-        //             log("executeResolveSuccess", "req", req);
-        //             resolve(req);
-        //             self.removeListener("executeResolveSuccess");
-        //         })
-        //
-        //         self.on("executeResolveFail", function (req) {
-        //             log("executeResolveFail", "req", req);
-        //             reject(req);
-        //             self.removeListener("executeResolveFail");
-        //         })
-        //     })
-        // }
+        async $before(selector) {
+
+            // const {exceptionDetails, result: remoteObject} = await this._client.send('Runtime.evaluate', {
+            //     expression: expressionWithSourceUrl,
+            //     contextId,
+            //     returnByValue: false,
+            //     awaitPromise: true,
+            //     userGesture: true
+            // }).catch(rewriteError);
+            console.log(selector)
+            return new Promise((resolve, reject) => {
+                let self = this;
+                //todo
+                let code = 'let re = document.querySelector("' + selector + '");' + "\n" +
+                    'console.log(re);' +
+                    'console.log("fuckyou");' +
+                    'chrome.runtime.sendMessage(re);' + "\n" +
+                    'console.log("end");';
+                log.log("将要执行的代码为", code);
+                // code = "console.log('a')";
+                chrome.tabs.executeScript(self.id, {
+                    code: code
+                });
+                log.log("finish")
+                self.once("evaluateCallBack", function (req) {
+                    // return new ElementHandle(req);
+                    resolve(req);
+                });
+            })
+        }
+
         //
         // $$(selector) {
         //     return new Promise((resolve, reject) => {
